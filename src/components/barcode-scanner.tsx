@@ -1,3 +1,4 @@
+//TODO this isnt used yet
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, Result, BarcodeFormat } from '@zxing/library';
