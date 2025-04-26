@@ -33,6 +33,22 @@ export default function ScanPage() {
             })
     }
 
+    function createProductCard(jsonRaw: any, barcode: string): Product {
+        console.log(jsonRaw.name);
+        const product: Product = {
+            barcode: barcode,  
+            name: jsonRaw.name,
+            description: jsonRaw.description,
+            price: jsonRaw.price,
+            sustainabilityScore: jsonRaw.sustainabilityScore,
+            nutritionValue: jsonRaw.nutritionValue,
+            holisticRating: jsonRaw.holisticRating,
+            brand: jsonRaw.brand,
+            image: jsonRaw.image || "/placeholder.svg",
+            scannedDate: "",
+        };
+        return product;
+    }
     async function fetchProductData(barcode: string) {
         try {
             const response = await fetch(`${backendurl}addProduct`, {
@@ -46,7 +62,8 @@ export default function ScanPage() {
             }
             const data = await response.json();
             //TODO: parse the json into acc stuff the product class can use
-            console.log(data);
+            setProductData(createProductCard(data.data, barcode));
+            console.log(productData);
         } catch (error) {
             throw error;
         }
@@ -139,6 +156,7 @@ export default function ScanPage() {
                                     <ProductCard product={productData} />
                                 </div>
                             ) : null}
+
                         </motion.div>
                     )}
                 </motion.div>

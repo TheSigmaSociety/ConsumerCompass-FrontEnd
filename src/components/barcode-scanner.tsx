@@ -62,7 +62,9 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
             
             setScanSuccess(true);
             setTimeout(() => setScanSuccess(false), 1500);
-            //if (onScan) onScan(text);
+            if (onScan) {
+              stopScanning();
+            }
           }
         }
       );
