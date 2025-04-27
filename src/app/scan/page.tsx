@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "framer-motion"
+import { useState, useRef, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Camera, ArrowDown, Loader2 } from "lucide-react"
 import BarcodeScanner from "@/components/barcode-scanner"
 import ProductCard from "@/components/product-card"
@@ -14,6 +14,7 @@ export default function ScanPage() {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const backendurl = "https://sigmasociety.dedyn.io/api/"
+    const resultRef = useRef<HTMLDivElement>(null)
 
     function handleScanner(result: string) {
         setResult(result)
@@ -61,9 +62,18 @@ export default function ScanPage() {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            //TODO: parse the json into acc stuff the product class can use
             setProductData(createProductCard(data.data, barcode));
             console.log(productData);
+            
+            // Add setTimeout to ensure state is updated before scrolling
+            setTimeout(() => {
+                if (resultRef.current) {
+                    resultRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }, 100);
         } catch (error) {
             throw error;
         }
@@ -94,6 +104,40 @@ export default function ScanPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative">
+            {/* Blur overlay while loading */}
+            <AnimatePresence>
+                {isLoading && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-40 flex items-center justify-center"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-8 rounded-xl shadow-lg"
+                        >
+                            <div className="flex flex-col items-center">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                    className="mb-4"
+                                >
+                                    <Loader2 className="h-12 w-12 text-green-600 dark:text-green-400" />
+                                </motion.div>
+                                <p className="text-slate-700 dark:text-slate-300 font-medium">
+                                    Fetching product information...
+                                </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="fixed inset-0 bg-[radial-gradient(circle_at_30%_20%,#4ade8033,transparent_40%)] dark:bg-[radial-gradient(circle_at_30%_20%,#4ade8015,transparent_40%)] z-0"></div>
             <div className="fixed inset-0 bg-[radial-gradient(circle_at_70%_60%,#38bdf833,transparent_40%)] dark:bg-[radial-gradient(circle_at_70%_60%,#38bdf815,transparent_40%)] z-0"></div>
             <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_80%,#22c55e33,transparent_40%)] dark:bg-[radial-gradient(circle_at_20%_80%,#22c55e15,transparent_40%)] z-0"></div>
@@ -133,6 +177,7 @@ export default function ScanPage() {
 
                     {result && (
                         <motion.div
+                            ref={resultRef}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
@@ -142,12 +187,7 @@ export default function ScanPage() {
                                 <ArrowDown className="h-8 w-8 text-green-600 dark:text-green-400 animate-bounce" />
                             </div>
 
-                            {isLoading ? (
-                                <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-800 rounded-xl shadow-md">
-                                    <Loader2 className="h-8 w-8 text-green-600 dark:text-green-400 animate-spin mb-4" />
-                                    <p className="text-slate-700 dark:text-slate-300">Fetching product information...</p>
-                                </div>
-                            ) : error ? (
+                            {error ? (
                                 <div className="p-8 bg-white dark:bg-slate-800 rounded-xl shadow-md">
                                     <p className="text-red-500 dark:text-red-400">{error}</p>
                                 </div>
@@ -156,7 +196,6 @@ export default function ScanPage() {
                                     <ProductCard product={productData} />
                                 </div>
                             ) : null}
-
                         </motion.div>
                     )}
                 </motion.div>
