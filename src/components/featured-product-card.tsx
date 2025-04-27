@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star, TrendingUp, Leaf, Apple } from "lucide-react"
+import Image from "next/image"
 import { Product } from "@/data/sample-products"
 
 export default function FeaturedProductCard({ product }: { product: Product }) {
@@ -70,10 +71,13 @@ export default function FeaturedProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900/20 dark:to-indigo-900/20 p-8 flex items-center justify-center">
-            <img
+            <Image
               src={product.image || "/placeholder.svg"}
               alt={product.name}
-              className="max-w-full h-auto rounded-lg shadow-lg"
+              width={400}
+              height={300}
+              className="rounded-lg shadow-lg"
+              style={{ objectFit: "contain" }}
             />
         </div>
       </div>

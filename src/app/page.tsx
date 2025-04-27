@@ -187,7 +187,7 @@ export default function HomePage() {
                 Product of the Week
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 dark:text-white">
-                This Week's Top Pick
+                This Week&apos;s Top Pick
               </h2>
             </motion.div>
 

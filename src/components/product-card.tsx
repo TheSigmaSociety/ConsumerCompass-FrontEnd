@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
+import Image from "next/image"
 import { Product } from "@/data/sample-products"
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -10,7 +11,14 @@ export default function ProductCard({ product }: { product: Product }) {
       className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
     >
       <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center p-4">
-        <img src={product.image || "/placeholder.svg"} alt={product.name} className="max-h-full w-auto" />
+        <Image 
+          src={product.image || "/placeholder.svg"} 
+          alt={product.name} 
+          width={200} 
+          height={150}
+          className="max-h-full w-auto" 
+          style={{ objectFit: "contain" }}
+        />
       </div>
 
       <div className="p-6 flex flex-col flex-1">

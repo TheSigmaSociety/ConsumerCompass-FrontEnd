@@ -31,7 +31,7 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
         scannerRef.current?.reset();
       }
     };
-  }, []);
+  }, [scanning]);
 
   const startScanning = async () => {
     if (!scannerRef.current) return;
@@ -52,7 +52,7 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
 
       // Start scanning
       scannerRef.current.decodeFromVideoDevice(
-        undefined,  // using default device
+        null,  // using default device
         videoRef.current!,
         (result: Result | null) => {
           setLoadingCamera(false);
@@ -80,7 +80,7 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
           setError(`Error accessing camera: ${err.message}`);
         }
       } else {
-        setError('Error occured while accessing camera');
+        setError('Error occurred while accessing camera');
       }
       
       setScanning(false);
