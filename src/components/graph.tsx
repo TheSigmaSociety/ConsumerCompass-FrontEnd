@@ -11,13 +11,11 @@ interface GraphProps {
   data: Point[]
 }
 
-// Format timestamp to readable date with time
 const formatDate = (timestamp: number): string => {
   const date = new Date(timestamp);
   return date.toLocaleString();  // Will show both date and time
 }
 
-// Custom tooltip component
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     return (

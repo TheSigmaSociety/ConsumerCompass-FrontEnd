@@ -164,7 +164,6 @@ const AnalyticsPage = () => {
     }
   }, [product, brand])
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -187,7 +186,6 @@ const AnalyticsPage = () => {
     },
   }
 
-  // Product card skeleton loader
   const ProductCardSkeleton = () => (
     <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col h-full">
       <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center p-4">
@@ -263,7 +261,6 @@ const AnalyticsPage = () => {
                     console.log(`Selected option: ${selectedOption}`)
                     setBrand(selectedOption)
                     fetchProductsFromBrand(selectedOption)
-                    // Clear graph data and reset product selection when brand changes
                     setGraph(undefined)
                     setProduct(undefined)
                     setProductData(undefined)

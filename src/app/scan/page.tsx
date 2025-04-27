@@ -65,7 +65,6 @@ export default function ScanPage() {
             setProductData(createProductCard(data.data, barcode));
             console.log(productData);
             
-            // Add setTimeout to ensure state is updated before scrolling
             setTimeout(() => {
                 if (resultRef.current) {
                     resultRef.current.scrollIntoView({
@@ -79,7 +78,6 @@ export default function ScanPage() {
         }
     }
 
-    // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -104,7 +102,6 @@ export default function ScanPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative">
-            {/* Blur overlay while loading */}
             <AnimatePresence>
                 {isLoading && (
                     <motion.div 

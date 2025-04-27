@@ -95,7 +95,6 @@ export default function HomePage() {
     console.log("Products state updated:", products.length, "items")
   }, [products])
 
-  // Ensure we have products before trying to access them
   const featuredProduct = products && products.length > 0 ? products[0] : null
   const otherProducts = products && products.length > 1 ? products.slice(1) : []
 
