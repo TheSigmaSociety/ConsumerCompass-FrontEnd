@@ -62,7 +62,7 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
             
             setScanSuccess(true);
             setTimeout(() => setScanSuccess(false), 1500);
-            if(text) stopScanning();
+            if(text != null) stopScanning(text);
             
           }
         }
@@ -87,10 +87,10 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
     }
   };
 
-  const stopScanning = () => {
+  const stopScanning = (text:string) => {
     if (scannerRef.current) {
       scannerRef.current.reset();
-      onScan(lastResult);
+      onScan(text);
       setScanning(false);
     }
   };
