@@ -17,10 +17,10 @@ const Graph: React.FC<GraphProps> = ({ data }) => {
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis className="text-white" dataKey="timestamp" label={{ value: "Time", position: "insideBottom", offset: -5 }} />
+                    <XAxis className="text-white" dataKey="x" label={{ value: "Time", position: "insideBottom", offset: -5 }} />
                     <YAxis className="text-white" label={{ value: "Holistic Score", angle: -90, position: "insideLeft" }} />
                     <Tooltip />
-                    <Line type="monotone" dataKey="holisticRating" stroke="#ff0000" strokeWidth={3} />
+                    <Line type="monotone" dataKey="y" stroke="#ff0000" strokeWidth={3} />
                 </LineChart>
             </ResponsiveContainer>
         

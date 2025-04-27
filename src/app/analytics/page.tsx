@@ -5,6 +5,8 @@ import Graph from '@/components/graph';
 import { Product } from '@/data/sample-products';
 import { List } from '@zxing/library/esm/customTypings';
 import ProductCard from '@/components/product-card';
+import { Point } from 'recharts/types/shape/Curve';
+import { Point } from '@zxing/library/esm/core/aztec/detector/Detector';
 const backendurl = "https://sigmasociety.dedyn.io/api/"
 
 const AnalyticsPage = () => {
@@ -111,7 +113,6 @@ const AnalyticsPage = () => {
             const data = await response.json();
             //TODO: parse the json into acc stuff the product class can use
             setProductData(createProductCard(data.data, barcode));
-            console.log(productData);
         } catch (error) {
             throw error;
         }
@@ -119,17 +120,23 @@ const AnalyticsPage = () => {
     async function fetchProductGraph(barcode: string) {
         try {
             const response = await fetch(`${backendurl}getData/${barcode}`, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                }, body: JSON.stringify({ "barcode": barcode }),
+                },
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
+            const output: Point[] = [];
+            const accData = data.data.ratings;
+            for(let i = 0; i < accData.length; i++) {
+                output.push({ x: accData[i].timestamp , y: accData[i].rating.holisticRating });
+            }
+            console.log(output);
+            setGraph(output);
             //TODO: parse the json into acc stuff the product class can use
-            console.log(data);
         } catch (error) {
             throw error;
         }
@@ -146,7 +153,7 @@ const AnalyticsPage = () => {
         if(product && brand && name2Barcode) {
             console.log("im gonna product");
             fetchProductData(name2Barcode.get(product) || "");
-            
+            fetchProductGraph(name2Barcode.get(product) || "")
         }
     }, [product,brand]);
     return (
