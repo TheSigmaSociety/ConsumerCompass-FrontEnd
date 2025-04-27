@@ -152,7 +152,6 @@ const AnalyticsPage = () => {
     useEffect(() => {
         if(product && brand && name2Barcode) {
             console.log("im gonna product");
-            fetchProductData(name2Barcode.get(product) || "");
             fetchProductGraph(name2Barcode.get(product) || "")
         }
     }, [product,brand]);
