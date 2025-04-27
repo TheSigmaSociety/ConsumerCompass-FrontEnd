@@ -1,12 +1,8 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
-<<<<<<< HEAD
 import Image from "next/image"
-import { Product } from "@/data/sample-products"
-=======
 import { Product } from "@/data/product"
->>>>>>> 4b1f0e8c1514b17bf8b3633262d3f5abda82ee60
 
 export default function ProductCard({ product, isLoading = false }: { product: Product, isLoading?: boolean }) {
   if (isLoading) {
@@ -55,7 +51,7 @@ export default function ProductCard({ product, isLoading = false }: { product: P
       className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
     >
       <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center p-4">
-        <Image 
+        <img 
           src={product.image || "/placeholder.svg"} 
           alt={product.name} 
           width={200} 
