@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { Star, TrendingUp, Leaf, Apple } from "lucide-react"
 <<<<<<< HEAD
 import Image from "next/image"
-import { Product } from "@/data/sample-products"
+import { Product } from "@/data/product"
 =======
 import { Product } from "@/data/product"
 >>>>>>> 4b1f0e8c1514b17bf8b3633262d3f5abda82ee60
