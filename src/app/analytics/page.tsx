@@ -222,6 +222,10 @@ const AnalyticsPage = () => {
                     console.log(`Selected option: ${selectedOption}`)
                     setBrand(selectedOption)
                     fetchProductsFromBrand(selectedOption)
+                    // Clear graph data and reset product selection when brand changes
+                    setGraph(undefined)
+                    setProduct(undefined)
+                    setProductData(undefined)
                   }}
                 >
                   <option value="" disabled selected>
@@ -245,6 +249,7 @@ const AnalyticsPage = () => {
                       console.log(`Selected option: ${selectedOption}`)
                       setProduct(selectedOption)
                     }}
+                    value={product || ""}
                   >
                     <option value="" disabled selected>
                       Select a product
