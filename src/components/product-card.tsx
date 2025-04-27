@@ -1,7 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
-import { Product } from "@/data/sample-products"
+import { Product } from "@/data/product"
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
@@ -44,8 +44,12 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{product.description}</p>
         </div>
         <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="text-lg font-bold text-slate-900 dark:text-white">${product.price.toFixed(2)}</span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">Scanned: {new Date(product.scannedDate).toLocaleDateString()}</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-white">
+            ${(product.rawPrice || product.priceValue || product.price).toFixed(2)}
+          </span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {product.scannedDate ? `Scanned: ${new Date(product.scannedDate).toLocaleDateString()}` : "Recently added"}
+          </span>
         </div>
       </div>
     </motion.div>

@@ -1,7 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star, TrendingUp, Leaf, Apple } from "lucide-react"
-import { Product } from "@/data/sample-products"
+import { Product } from "@/data/product"
 
 export default function FeaturedProductCard({ product }: { product: Product }) {
   return (
@@ -41,23 +41,27 @@ export default function FeaturedProductCard({ product }: { product: Product }) {
               <Leaf className="h-5 w-5 text-green-500 mr-2" />
               <div>
                 <div className="text-sm text-slate-600 dark:text-slate-400te">Sustainability</div>
-                <div className="font-semibold text-white">{product.sustainabilityScore.toFixed(1)}/5.0</div>
+                <div className="font-semibold text-slate-800 dark:text-white">{product.sustainabilityScore.toFixed(1)}/5.0</div>
               </div>
             </div>
             
-            {product.nutritionValue > 0 && (
+            {(product.nutritionalValue || product.nutritionValue) > 0 && (
               <div className="flex items-center">
                 <Apple className="h-5 w-5 text-red-500 mr-2" />
                 <div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">Nutrition</div>
-                  <div className="font-semibold text-white">{product.nutritionValue.toFixed(1)}/5.0</div>
+                  <div className="font-semibold text-slate-800 dark:text-white">
+                    {(product.nutritionalValue || product.nutritionValue).toFixed(1)}/5.0
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           <div className="flex items-center justify-between mb-4">
-            <span className="text-3xl font-bold text-slate-900 dark:text-white">${product.price.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-slate-900 dark:text-white">
+              ${product.price.toFixed(2)}
+            </span>
             <div className="flex items-center text-emerald-600 dark:text-emerald-400 font-medium">
               <TrendingUp className="h-5 w-5 mr-1" />
               <span>Trending</span>
@@ -65,16 +69,16 @@ export default function FeaturedProductCard({ product }: { product: Product }) {
           </div>
           
           <div className="text-xs text-slate-500 dark:text-slate-400">
-            Scanned: {new Date(product.scannedDate).toLocaleDateString()}
+            {product.scannedDate ? `Scanned: ${new Date(product.scannedDate).toLocaleDateString()}` : "Recently added"} 
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900/20 dark:to-indigo-900/20 p-8 flex items-center justify-center">
-            <img
-              src={product.image || "/placeholder.svg"}
-              alt={product.name}
-              className="max-w-full h-auto rounded-lg shadow-lg"
-            />
+          <img
+            src={product.image || "/placeholder.svg"}
+            alt={product.name}
+            className="max-w-full h-auto rounded-lg shadow-lg"
+          />
         </div>
       </div>
     </motion.div>
