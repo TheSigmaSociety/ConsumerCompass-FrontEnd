@@ -3,7 +3,47 @@ import { motion } from "framer-motion"
 import { Star } from "lucide-react"
 import { Product } from "@/data/product"
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, isLoading = false }: { product: Product, isLoading?: boolean }) {
+  if (isLoading) {
+    return (
+      <motion.div
+        className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+      >
+        <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center p-4">
+          <div className="w-full h-32 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
+        </div>
+
+        <div className="p-6 flex flex-col flex-1">
+          <div>
+            <div className="flex items-center mb-3">
+              <div className="flex space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-4 w-4 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
+                ))}
+              </div>
+              <div className="ml-2 h-4 w-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+            </div>
+
+            <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-700 rounded mb-2 animate-pulse"></div>
+
+            <div className="flex gap-2 mb-3">
+              <div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-auto pt-2">
+            <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+            <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div
       whileHover={{ y: -8 }}

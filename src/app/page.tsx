@@ -6,6 +6,7 @@ import ProductCard from "@/components/product-card"
 import FeaturedProductCard from "@/components/featured-product-card"
 import Navbar from "@/components/navbar"
 import { Product } from "@/data/product"
+import Link from "next/link"
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -311,14 +312,16 @@ export default function HomePage() {
             )}
 
             <motion.div variants={itemVariants} className="mt-12 text-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                View All Products
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </motion.button>
+              <Link href="/analytics">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  View All Products
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </motion.button>
+              </Link>
             </motion.div>
           </motion.div>
         </section>

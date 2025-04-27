@@ -156,6 +156,7 @@ const AnalyticsPage = () => {
     if (product && brand && name2Barcode) {
       console.log("im gonna product")
       fetchProductGraph(name2Barcode.get(product) || "")
+      fetchProductData(name2Barcode.get(product) || "")
     }
   }, [product, brand])
 
@@ -227,8 +228,9 @@ const AnalyticsPage = () => {
                     setProduct(undefined)
                     setProductData(undefined)
                   }}
+                  value={brand}
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     Select a brand
                   </option>
                   {options?.map((option, index) => (
@@ -251,7 +253,7 @@ const AnalyticsPage = () => {
                     }}
                     value={product || ""}
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       Select a product
                     </option>
 
@@ -275,20 +277,32 @@ const AnalyticsPage = () => {
         ) : (
           <>
             {graph && (
-              <motion.div
-                variants={itemVariants}
-                className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden mb-10"
-              >
-                <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Holistic Rating Over Time</h3>
+              <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+                  <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Holistic Rating Over Time</h3>
+                  </div>
+                  <div className="p-6 h-80">
+                    <Graph data={graph} />
+                  </div>
                 </div>
-                <div className="p-4 h-64">
-                  <Graph data={graph} />
-                </div>
+                
+                {productData && (
+                  <div className="lg:col-span-1">
+                    <div className="h-full flex flex-col">
+                      <div className="p-6 bg-white dark:bg-slate-800 rounded-t-2xl shadow-lg border-b border-slate-200 dark:border-slate-700">
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Product Details</h3>
+                      </div>
+                      <div className="flex-grow bg-white dark:bg-slate-800 rounded-b-2xl shadow-lg overflow-hidden">
+                        <ProductCard product={productData} />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
-            {productData && (
+            {!graph && productData && (
               <motion.div variants={itemVariants} className="max-w-md mx-auto">
                 <ProductCard product={productData} />
               </motion.div>
