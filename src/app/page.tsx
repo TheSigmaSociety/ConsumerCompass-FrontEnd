@@ -1,11 +1,11 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { ArrowRight, Loader2 } from "lucide-react"
 import ProductCard from "@/components/product-card"
 import FeaturedProductCard from "@/components/featured-product-card"
 import Navbar from "@/components/navbar"
-import { Product } from "@/data/product"
+import type { Product } from "@/data/product"
 import Link from "next/link"
 
 export default function HomePage() {
@@ -13,56 +13,91 @@ export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoadingProducts, setIsLoadingProducts] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const URL = "https://sigmasociety.dedyn.io";
+  const URL = "https://sigmasociety.dedyn.io"
+  const [fetchAttempts, setFetchAttempts] = useState(0)
+
+  const createProductCard = useCallback((jsonRaw: any): Product => {
+    return {
+      barcode: jsonRaw.barcode || "",
+      name: jsonRaw.name || "Unknown Product",
+      description: jsonRaw.description || "No description available",
+      price: jsonRaw.rawPrice || jsonRaw.price || 0,
+      priceValue: jsonRaw.priceValue || 0,
+      rawPrice: jsonRaw.rawPrice || 0,
+      sustainabilityScore: jsonRaw.sustainabilityScore || 0,
+      nutritionValue: jsonRaw.nutritionValue || 0,
+      nutritionalValue: jsonRaw.nutritionalValue || 0,
+      holisticRating: jsonRaw.holisticRating || 0,
+      brand: jsonRaw.brand || "Unknown Brand",
+      image: jsonRaw.image || "/placeholder.svg",
+      scannedDate: jsonRaw.scannedDate || "",
+    }
+  }, [])
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      console.log("Fetching products, attempt:", fetchAttempts + 1)
+      setIsLoadingProducts(true)
+
+      const response = await fetch(`${URL}/api/topProducts`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log("API response:", data)
+
+      if (data && data.list && Array.isArray(data.list)) {
+        const productList: Product[] = data.list.map((jsonRaw: any) => createProductCard(jsonRaw))
+        console.log("Processed products:", productList.length)
+
+        if (productList.length === 0 && fetchAttempts < 3) {
+          console.log("No products received, retrying...")
+          setFetchAttempts((prev) => prev + 1)
+        } else {
+          setProducts(productList)
+        }
+      } else {
+        console.error("Invalid data format received:", data)
+        setError("Invalid data format received from server")
+
+        if (fetchAttempts < 3) {
+          console.log("Invalid data format, retrying...")
+          setFetchAttempts((prev) => prev + 1)
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err)
+      setError("Could not load products. Please try again later.")
+
+      if (fetchAttempts < 3) {
+        console.log("Error occurred, retrying...")
+        setFetchAttempts((prev) => prev + 1)
+      }
+    } finally {
+      setIsLoadingProducts(false)
+    }
+  }, [URL, fetchAttempts, createProductCard])
 
   useEffect(() => {
     setIsLoaded(true)
-    function createProductCard(jsonRaw: any): Product {
-      const product: Product = {
-          barcode: "",  
-          name: jsonRaw.name,
-          description: jsonRaw.description,
-          price: jsonRaw.rawPrice,
-          sustainabilityScore: jsonRaw.sustainabilityScore,
-          nutritionValue: jsonRaw.nutritionValue,
-          nutritionalValue: jsonRaw.nutritionValue,
-          holisticRating: jsonRaw.holisticRating,
-          brand: jsonRaw.brand,
-          image: jsonRaw.image || "/placeholder.svg",
-          scannedDate: "",
-      };
-      return product;
-    }
-    const fetchProducts = async () => {
-      try {
-        setIsLoadingProducts(true)
-        const response = await fetch(URL + "/api/topProducts")
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch products")
-        }
-        
-        const data = await response.json()
-        const productLis: Product[] = [];
-        for(const jsonRaw of data.list) {
-          productLis.push(createProductCard(jsonRaw))
-        }
-        console.log(data.list)
-        console.log(productLis)
-        setProducts(productLis)
-        setIsLoadingProducts(false)
-      } catch (err) {
-        console.error("Error fetching products:", err)
-        setError("Could not load products. Please try again later.")
-        setIsLoadingProducts(false)
-      }
-    }
-    
     fetchProducts()
-  }, [])
+  }, [fetchProducts])
 
-  const featuredProduct = products[0]
-  const otherProducts = products;
+  useEffect(() => {
+    console.log("Products state updated:", products.length, "items")
+  }, [products])
+
+  // Ensure we have products before trying to access them
+  const featuredProduct = products && products.length > 0 ? products[0] : null
+  const otherProducts = products && products.length > 1 ? products.slice(1) : []
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,14 +125,12 @@ export default function HomePage() {
     <div className="flex flex-col items-center justify-center py-12">
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
         className="mb-4"
       >
         <Loader2 className="h-12 w-12 text-green-600 dark:text-green-400" />
       </motion.div>
-      <p className="text-slate-700 dark:text-slate-300 font-medium">
-        Loading products...
-      </p>
+      <p className="text-slate-700 dark:text-slate-300 font-medium">Loading products...</p>
     </div>
   )
 
@@ -262,12 +295,24 @@ export default function HomePage() {
               ) : error ? (
                 <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-6 rounded-xl text-center">
                   {error}
+                  <button
+                    onClick={() => setFetchAttempts((prev) => prev + 1)}
+                    className="ml-4 mt-2 px-4 py-2 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 rounded-md hover:bg-red-200 dark:hover:bg-red-700"
+                  >
+                    Retry
+                  </button>
                 </div>
               ) : featuredProduct ? (
                 <FeaturedProductCard product={featuredProduct} />
               ) : (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 p-6 rounded-xl text-center">
                   No featured product available
+                  <button
+                    onClick={() => setFetchAttempts((prev) => prev + 1)}
+                    className="ml-4 mt-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-200 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-700"
+                  >
+                    Retry
+                  </button>
                 </div>
               )}
             </motion.div>
@@ -286,9 +331,6 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 dark:text-white">
                 Other Highly Rated Products
               </h2>
-              <p className="text-lg text-slate-700 dark:text-slate-300 max-w-3xl mx-auto">
-                Discover more exceptional items that have impressed our experts and received outstanding reviews.
-              </p>
             </motion.div>
 
             {isLoadingProducts ? (
@@ -296,18 +338,30 @@ export default function HomePage() {
             ) : error ? (
               <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-6 rounded-xl text-center">
                 {error}
+                <button
+                  onClick={() => setFetchAttempts((prev) => prev + 1)}
+                  className="ml-4 mt-2 px-4 py-2 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 rounded-md hover:bg-red-200 dark:hover:bg-red-700"
+                >
+                  Retry
+                </button>
               </div>
             ) : otherProducts.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {otherProducts.map((product, index) => (
-                  <motion.div key={index} variants={itemVariants}>
+                  <motion.div key={`product-${index}-${product.barcode || product.name}`} variants={itemVariants}>
                     <ProductCard product={product} />
                   </motion.div>
                 ))}
               </div>
             ) : (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 p-6 rounded-xl text-center">
-                No additional products available
+                No products available
+                <button
+                  onClick={() => setFetchAttempts((prev) => prev + 1)}
+                  className="ml-4 mt-2 px-4 py-2 bg-yellow-100 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-200 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-700"
+                >
+                  Retry
+                </button>
               </div>
             )}
 
@@ -316,9 +370,9 @@ export default function HomePage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
                 >
-                  View All Products
+                  View Product Analytics
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </motion.button>
               </Link>

@@ -93,7 +93,7 @@ export default function ProductCard({ product, isLoading = false }: { product: P
             </span>
           </div>
 
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{product.description}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{product.description}</p>
         </div>
         <div className="flex items-center justify-between mt-auto pt-2">
           <span className="text-lg font-bold text-slate-900 dark:text-white">

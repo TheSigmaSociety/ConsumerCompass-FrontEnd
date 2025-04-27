@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Github } from "lucide-react"
 
 export default function Navbar() {
   const [prevScrollPos, setPrevScrollPos] = useState(0)
@@ -65,7 +65,15 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
+              <a 
+                href="https://github.com/TheSigmaSociety" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-700 dark:text-slate-200 hover:text-green-600 dark:hover:text-green-400 transition-colors"
+              >
+                <Github className="h-5 w-5" />
+              </a>
               <button
                 className="md:hidden p-2 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

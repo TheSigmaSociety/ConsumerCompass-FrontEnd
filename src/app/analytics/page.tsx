@@ -33,6 +33,7 @@ const AnalyticsPage = () => {
   const [productOptions, setProductOptions] = React.useState<List<number>>()
   const [brand, setBrand] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoadingProduct, setIsLoadingProduct] = React.useState<boolean>(false)
 
   async function fetchOptions() {
     try {
@@ -101,6 +102,7 @@ const AnalyticsPage = () => {
   }
   async function fetchProductData(barcode: string) {
     try {
+      setIsLoadingProduct(true)
       const response = await fetch(`${backendurl}addProduct`, {
         method: "POST",
         headers: {
@@ -114,7 +116,9 @@ const AnalyticsPage = () => {
       const data = await response.json()
       //TODO: parse the json into acc stuff the product class can use
       setProductData(createProductCard(data.data, barcode))
+      setIsLoadingProduct(false)
     } catch (error) {
+      setIsLoadingProduct(false)
       throw error
     }
   }
@@ -182,6 +186,42 @@ const AnalyticsPage = () => {
       },
     },
   }
+
+  // Product card skeleton loader
+  const ProductCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm flex flex-col h-full">
+      <div className="h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center p-4">
+        <div className="w-full h-32 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse"></div>
+      </div>
+
+      <div className="p-6 flex flex-col flex-1">
+        <div>
+          <div className="flex items-center mb-3">
+            <div className="flex space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-4 w-4 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
+              ))}
+            </div>
+            <div className="ml-2 h-4 w-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+          </div>
+
+          <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-700 rounded mb-2 animate-pulse"></div>
+
+          <div className="flex gap-2 mb-3">
+            <div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse"></div>
+          </div>
+
+          <div className="space-y-2 mb-4">
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between mt-auto pt-2">
+          <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative">
@@ -286,25 +326,27 @@ const AnalyticsPage = () => {
                     <Graph data={graph} />
                   </div>
                 </div>
-                
-                {productData && (
-                  <div className="lg:col-span-1">
-                    <div className="h-full flex flex-col">
-                      <div className="p-6 bg-white dark:bg-slate-800 rounded-t-2xl shadow-lg border-b border-slate-200 dark:border-slate-700">
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Product Details</h3>
-                      </div>
-                      <div className="flex-grow bg-white dark:bg-slate-800 rounded-b-2xl shadow-lg overflow-hidden">
-                        <ProductCard product={productData} />
-                      </div>
+
+                <div className="lg:col-span-1">
+                  <div className="h-full flex flex-col">
+                    <div className="p-6 bg-white dark:bg-slate-800 rounded-t-2xl shadow-lg border-b border-slate-200 dark:border-slate-700">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Product Details</h3>
+                    </div>
+                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-b-2xl shadow-lg overflow-hidden">
+                      {isLoadingProduct ? (
+                        <ProductCardSkeleton />
+                      ) : (
+                        productData && <ProductCard product={productData} />
+                      )}
                     </div>
                   </div>
-                )}
+                </div>
               </motion.div>
             )}
 
-            {!graph && productData && (
+            {!graph && (
               <motion.div variants={itemVariants} className="max-w-md mx-auto">
-                <ProductCard product={productData} />
+                {isLoadingProduct ? <ProductCardSkeleton /> : productData && <ProductCard product={productData} />}
               </motion.div>
             )}
           </>
