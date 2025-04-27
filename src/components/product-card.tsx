@@ -21,16 +21,20 @@ export default function ProductCard({ product }: { product: Product }) {
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < Math.floor(product.holisticRating)
+                    i < Math.floor(product.holisticRating || 0)
                       ? "text-yellow-400 fill-yellow-400"
-                      : i < product.holisticRating
+                      : i < (product.holisticRating || 0)
                         ? "text-yellow-400 fill-yellow-400 opacity-50"
                         : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
-            <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">{product.holisticRating.toFixed(1)}</span>
+            <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">
+              {product.holisticRating !== null && product.holisticRating !== undefined 
+                ? product.holisticRating.toFixed(1) 
+                : 'N/A'}
+            </span>
           </div>
 
           <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">{product.name}</h3>
@@ -45,7 +49,12 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
         <div className="flex items-center justify-between mt-auto pt-2">
           <span className="text-lg font-bold text-slate-900 dark:text-white">
-            ${(product.rawPrice || product.priceValue || product.price).toFixed(2)}
+            {(() => {
+              const price = product.rawPrice || product.priceValue || product.price;
+              return price !== null && price !== undefined 
+                ? `$${price.toFixed(2)}` 
+                : 'Price unavailable';
+            })()}
           </span>
           <span className="text-xs text-slate-500 dark:text-slate-400">
             {product.scannedDate ? `Scanned: ${new Date(product.scannedDate).toLocaleDateString()}` : "Recently added"}

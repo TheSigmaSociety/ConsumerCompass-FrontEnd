@@ -60,7 +60,7 @@ export default function FeaturedProductCard({ product }: { product: Product }) {
 
           <div className="flex items-center justify-between mb-4">
             <span className="text-3xl font-bold text-slate-900 dark:text-white">
-              ${product.price.toFixed(2)}
+              ${(product.rawPrice || product.priceValue || product.price || 0).toFixed(2)}
             </span>
             <div className="flex items-center text-emerald-600 dark:text-emerald-400 font-medium">
               <TrendingUp className="h-5 w-5 mr-1" />
