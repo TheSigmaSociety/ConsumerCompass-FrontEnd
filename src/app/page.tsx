@@ -1,18 +1,67 @@
 "use client"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Loader2 } from "lucide-react"
 import ProductCard from "@/components/product-card"
 import FeaturedProductCard from "@/components/featured-product-card"
 import Navbar from "@/components/navbar"
-import { featuredProduct, products } from "@/data/sample-products"
+import { Product } from "@/data/product"
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const URL = "https://sigmasociety.dedyn.io";
 
   useEffect(() => {
     setIsLoaded(true)
+    function createProductCard(jsonRaw: any): Product {
+      const product: Product = {
+          barcode: "",  
+          name: jsonRaw.name,
+          description: jsonRaw.description,
+          price: jsonRaw.rawPrice,
+          sustainabilityScore: jsonRaw.sustainabilityScore,
+          nutritionValue: jsonRaw.nutritionValue,
+          nutritionalValue: jsonRaw.nutritionValue,
+          holisticRating: jsonRaw.holisticRating,
+          brand: jsonRaw.brand,
+          image: jsonRaw.image || "/placeholder.svg",
+          scannedDate: "",
+      };
+      return product;
+    }
+    const fetchProducts = async () => {
+      try {
+        setIsLoadingProducts(true)
+        const response = await fetch(URL + "/api/topProducts")
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch products")
+        }
+        
+        const data = await response.json()
+        const productLis: Product[] = [];
+        for(const jsonRaw of data.list) {
+          productLis.push(createProductCard(jsonRaw))
+        }
+        console.log(data.list)
+        console.log(productLis)
+        setProducts(productLis)
+        setIsLoadingProducts(false)
+      } catch (err) {
+        console.error("Error fetching products:", err)
+        setError("Could not load products. Please try again later.")
+        setIsLoadingProducts(false)
+      }
+    }
+    
+    fetchProducts()
   }, [])
+
+  const featuredProduct = products[0]
+  const otherProducts = products;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -35,6 +84,21 @@ export default function HomePage() {
       },
     },
   }
+
+  const renderLoadingSpinner = () => (
+    <div className="flex flex-col items-center justify-center py-12">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+        className="mb-4"
+      >
+        <Loader2 className="h-12 w-12 text-green-600 dark:text-green-400" />
+      </motion.div>
+      <p className="text-slate-700 dark:text-slate-300 font-medium">
+        Loading products...
+      </p>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative">
@@ -192,7 +256,19 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <FeaturedProductCard product={featuredProduct} />
+              {isLoadingProducts ? (
+                renderLoadingSpinner()
+              ) : error ? (
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-6 rounded-xl text-center">
+                  {error}
+                </div>
+              ) : featuredProduct ? (
+                <FeaturedProductCard product={featuredProduct} />
+              ) : (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 p-6 rounded-xl text-center">
+                  No featured product available
+                </div>
+              )}
             </motion.div>
           </motion.div>
         </section>
@@ -214,13 +290,25 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product) => (
-                <motion.div key={product.barcode} variants={itemVariants}>
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
-            </div>
+            {isLoadingProducts ? (
+              renderLoadingSpinner()
+            ) : error ? (
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-6 rounded-xl text-center">
+                {error}
+              </div>
+            ) : otherProducts.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {otherProducts.map((product, index) => (
+                  <motion.div key={index} variants={itemVariants}>
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 p-6 rounded-xl text-center">
+                No additional products available
+              </div>
+            )}
 
             <motion.div variants={itemVariants} className="mt-12 text-center">
               <motion.button

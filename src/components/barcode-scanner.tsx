@@ -1,4 +1,3 @@
-//TODO this isnt used yet
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, Result, BarcodeFormat } from '@zxing/library';
@@ -63,7 +62,8 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
             
             setScanSuccess(true);
             setTimeout(() => setScanSuccess(false), 1500);
-            if (onScan) onScan(text);
+            if(text != null) stopScanning(text);
+            
           }
         }
       );
@@ -87,9 +87,10 @@ export default function BarcodeScanner({ onScan }: BarcodeScannerProps) {
     }
   };
 
-  const stopScanning = () => {
+  const stopScanning = (text:string) => {
     if (scannerRef.current) {
       scannerRef.current.reset();
+      onScan(text);
       setScanning(false);
     }
   };

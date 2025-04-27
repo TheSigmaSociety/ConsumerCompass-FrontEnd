@@ -1,8 +1,12 @@
 "use client"
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
+<<<<<<< HEAD
 import Image from "next/image"
 import { Product } from "@/data/sample-products"
+=======
+import { Product } from "@/data/product"
+>>>>>>> 4b1f0e8c1514b17bf8b3633262d3f5abda82ee60
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
@@ -29,16 +33,20 @@ export default function ProductCard({ product }: { product: Product }) {
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < Math.floor(product.holisticRating)
+                    i < Math.floor(product.holisticRating || 0)
                       ? "text-yellow-400 fill-yellow-400"
-                      : i < product.holisticRating
+                      : i < (product.holisticRating || 0)
                         ? "text-yellow-400 fill-yellow-400 opacity-50"
                         : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
-            <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">{product.holisticRating.toFixed(1)}</span>
+            <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">
+              {product.holisticRating !== null && product.holisticRating !== undefined 
+                ? product.holisticRating.toFixed(1) 
+                : 'N/A'}
+            </span>
           </div>
 
           <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">{product.name}</h3>
@@ -52,8 +60,17 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{product.description}</p>
         </div>
         <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="text-lg font-bold text-slate-900 dark:text-white">${product.price.toFixed(2)}</span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">Scanned: {new Date(product.scannedDate).toLocaleDateString()}</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-white">
+            {(() => {
+              const price = product.rawPrice || product.priceValue || product.price;
+              return price !== null && price !== undefined 
+                ? `$${price.toFixed(2)}` 
+                : 'Price unavailable';
+            })()}
+          </span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {product.scannedDate ? `Scanned: ${new Date(product.scannedDate).toLocaleDateString()}` : "Recently added"}
+          </span>
         </div>
       </div>
     </motion.div>
